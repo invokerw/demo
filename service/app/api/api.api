@@ -1,0 +1,42 @@
+syntax = "v1"
+
+import (
+	"apis/user.api"
+)
+
+type Request {
+	Name string `path:"name,options=you|me"`
+}
+
+type Response {
+	Message string `json:"message"`
+}
+
+service api-api {
+	@handler ApiHandler
+	get /from/:name(Request) returns (Response)
+}
+
+//========================> user v1 <===================================
+//no need login
+@server(
+	prefix: v1/user
+	group: user
+)
+service api-api {
+	@doc "login"
+	@handler login
+	post /login (LoginReq) returns (LoginResp)
+}
+
+//need login
+@server(
+	prefix: v1/user
+	group: user
+	jwt: JwtAuth //use jwt
+)
+service api-api {
+	@doc "get user info"
+	@handler detail
+	post /info (UserInfoReq) returns (UserInfoResp)
+}
